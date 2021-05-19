@@ -460,6 +460,7 @@ Resources:
           Key: Compliance
           Value: !Ref Compliance
     Type: "AWS::RDS::DBInstance"
+
   DBParamGroup:
     Type: AWS::RDS::DBParameterGroup
     Properties:
@@ -468,6 +469,10 @@ Resources:
       Parameters:
         log_rotation_age: '1440'
         log_rotation_size: '102400'
+        # The following are recommended to assist security scanning.
+        log_statement: "ddl"
+        log_min_duration_statement: 15000
+
   RDSDBClusterParameterGroup:
     Type: AWS::RDS::DBClusterParameterGroup
     Properties:
