@@ -480,6 +480,10 @@ Resources:
       Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
       Parameters:
         rds.force_ssl: 0
+        # The following are recommended to assist security scanning.
+        log_statement: "ddl"
+        log_min_duration_statement: 15000
+
   AuroraDBCluster:
     Type: "AWS::RDS::DBCluster"
     Properties:
