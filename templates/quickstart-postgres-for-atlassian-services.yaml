@@ -264,7 +264,6 @@ Resources:
         - Key: "atl:quickstart:timestamp"
           Value: "TIMESTAMP: 2021-02-12T01:35:01Z"
       VPCSecurityGroups: [!Ref CustomDBSecurityGroup]
-      PubliclyAccessible: false
     
 Outputs:
   RDSEndPointAddress:
