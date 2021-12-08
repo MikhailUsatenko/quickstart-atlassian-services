@@ -30,6 +30,7 @@ Metadata:
       - DBMultiAZ
       - DBAllocatedStorageEncrypted
       - DBExportLogToCloudwatch
+      - DBAllowMajorVersionUpgrade
       - EnableEventSubscription
       - NotificationList
     - Label:
@@ -64,6 +65,8 @@ Metadata:
         default: Database port
       DBAccessCIDR:
         default: Database connection CIDR
+      DBAllowMajorVersionUpgrade:
+        default: Allow major database version upgrade
       DBMultiAZ:
         default: Multi-AZ deployment
       Subnet1ID:
@@ -263,6 +266,13 @@ Parameters:
     MinLength: "0"
     Default: 'AuroraPostgresDB'
     Type: String
+  DBAllowMajorVersionUpgrade:
+    Default: false
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: Must be 'true' or 'false'.
+    Type: String
   CustomDBSecurityGroup:
     Description: "ID of the security group (e.g., sg-0234se). One will be created for you if left empty."
     Type: String
@@ -418,6 +428,7 @@ Resources:
       TargetKeyId: !Ref EncryptionKey
   AuroraDB1:
     Properties:
+      AllowMajorVersionUpgrade: !Ref DBAllowMajorVersionUpgrade
       AutoMinorVersionUpgrade: !Ref DBAutoMinorVersionUpgrade
       DBClusterIdentifier: !Ref AuroraDBCluster
       DBInstanceClass: !Ref DBInstanceClass
@@ -451,6 +462,7 @@ Resources:
   AuroraDB2:
     Condition: IsDBMultiAZ
     Properties:
+      AllowMajorVersionUpgrade: !Ref DBAllowMajorVersionUpgrade
       AutoMinorVersionUpgrade: !Ref DBAutoMinorVersionUpgrade
       DBClusterIdentifier: !Ref AuroraDBCluster
       DBInstanceClass: !Ref DBInstanceClass
@@ -484,6 +496,7 @@ Resources:
   AuroraDB3:
     Condition: IsDBMultiAZ
     Properties:
+      AllowMajorVersionUpgrade: !Ref DBAllowMajorVersionUpgrade
       AutoMinorVersionUpgrade: !Ref DBAutoMinorVersionUpgrade
       DBClusterIdentifier: !Ref AuroraDBCluster
       DBInstanceClass: !Ref DBInstanceClass

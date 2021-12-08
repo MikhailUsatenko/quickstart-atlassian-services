@@ -121,6 +121,13 @@ Parameters:
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Description: Database storage type. Not used for Amazon Aurora.
     Type: String
+  DBAllowMajorVersionUpgrade:
+    Default: false
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: Must be 'true' or 'false'.
+    Type: String
   QSS3BucketName:
     Default: 'aws-quickstart'
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -206,6 +213,7 @@ Resources:
         DBMultiAZ: !Ref DBMultiAZ
         DBName: ''
         DBPort: '5432'
+        DBAllowMajorVersionUpgrade: !Ref DBAllowMajorVersionUpgrade
         EnableEventSubscription: 'false'
         Subnet1ID: !Select
           - 0
@@ -253,6 +261,7 @@ Resources:
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMultiAZ: !Ref DBMultiAZ
         DBStorageType: !Ref DBStorageType
+        DBAllowMajorVersionUpgrade: !Ref DBAllowMajorVersionUpgrade
         Subnet1ID: !Select
           - 0
           - !Split

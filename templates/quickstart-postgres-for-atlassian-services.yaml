@@ -14,6 +14,8 @@
 # DBPort
 # DBAllocatedStorageEncrypted
 # DBStorageType
+# DBAllowMajorVersionUpgrade
+
 AWSTemplateFormatVersion: 2010-09-09
 Description: RDS Postgres Database for use in Atlassian Standard Infrastructure (qs-1aj6s44e4)
 Metadata:
@@ -130,6 +132,13 @@ Parameters:
       - Provisioned IOPS
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Description: Database storage type
+    Type: String
+  DBAllowMajorVersionUpgrade:
+    Default: false
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: Must be 'true' or 'false'.
     Type: String
   CustomDBSecurityGroup:
     Description: The security group to apply to the database
@@ -293,6 +302,7 @@ Resources:
     Type: AWS::RDS::DBInstance
     Properties:
       AllocatedStorage: !Ref DBAllocatedStorage
+      AllowMajorVersionUpgrade: !Ref DBAllowMajorVersionUpgrade
       AutoMinorVersionUpgrade: !Ref DBAutoMinorVersionUpgrade
       BackupRetentionPeriod: !Ref DBBackupRetentionPeriod
       DBInstanceClass: !Ref DBInstanceClass
