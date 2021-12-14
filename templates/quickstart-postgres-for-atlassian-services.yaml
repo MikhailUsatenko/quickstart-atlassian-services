@@ -163,8 +163,8 @@ Conditions:
     !Equals [!Ref DBStorageType, io1]
   UseDatabaseEncryption:
     !Equals [!Ref DBAllocatedStorageEncrypted, true]
-  BlueDeployment: !Equals [!Ref MajorVersionUpgrade, "Blue"]
-  GreenDeployment: !Equals [!Ref MajorVersionUpgrade, "Green"]
+  BlueDeployment: !Equals [!Ref DBMajorVersionUpgradeSwtich, "Blue"]
+  GreenDeployment: !Equals [!Ref DBMajorVersionUpgradeSwtich, "Green"]
 
 Resources:
   DBSubnetGroup: 

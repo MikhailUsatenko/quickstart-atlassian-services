@@ -269,6 +269,7 @@ Resources:
         DBMultiAZ: !Ref DBMultiAZ
         DBStorageType: !Ref DBStorageType
         DBAllowMajorVersionUpgrade: !Ref DBAllowMajorVersionUpgrade
+        DBMajorVersionUpgradeSwtich: !Ref DBMajorVersionUpgradeSwtich
         Subnet1ID: !Select
           - 0
           - !Split
