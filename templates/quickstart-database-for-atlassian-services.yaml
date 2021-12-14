@@ -128,6 +128,13 @@ Parameters:
       - false
     ConstraintDescription: Must be 'true' or 'false'.
     Type: String
+  DBMajorVersionUpgradeSwtich:
+    Default: "Green"
+    AllowedValues:
+      - "Green"
+      - "Blue"
+    ConstraintDescription: Must be 'Green' or 'Blue'.
+    Description: When updaing DB engine version, update this value to Green if Blue, Blue if Green. 
   QSS3BucketName:
     Default: 'aws-quickstart'
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$

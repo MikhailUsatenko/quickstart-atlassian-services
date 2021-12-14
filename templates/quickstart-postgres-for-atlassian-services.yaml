@@ -140,6 +140,14 @@ Parameters:
       - false
     ConstraintDescription: Must be 'true' or 'false'.
     Type: String
+  DBMajorVersionUpgradeSwtich:
+    Default: "Green"
+    AllowedValues:
+      - "Green"
+      - "Blue"
+    ConstraintDescription: Must be 'Green' or 'Blue'.
+    Description: When updaing DB engine version, switch this value to Green if Blue, Blue if Green. 
+    Type: String
   CustomDBSecurityGroup:
     Description: The security group to apply to the database
     Type: AWS::EC2::SecurityGroup::Id
@@ -155,6 +163,8 @@ Conditions:
     !Equals [!Ref DBStorageType, io1]
   UseDatabaseEncryption:
     !Equals [!Ref DBAllocatedStorageEncrypted, true]
+  BlueDeployment: !Equals [!Ref MajorVersionUpgrade, "Blue"]
+  GreenDeployment: !Equals [!Ref MajorVersionUpgrade, "Green"]
 
 Resources:
   DBSubnetGroup: 
@@ -288,8 +298,19 @@ Resources:
             - logs:PutLogEvents
             Resource: !Sub "arn:${AWS::Partition}:logs:*:${AWS::AccountId}:log-group:/aws/lambda/*DBNameGenerator*"
 
-  DBParamGroup:
+  DBParamGroupGreen:
     Type: AWS::RDS::DBParameterGroup
+    Condition: GreenDeployment
+    Properties:
+      Description: "DB Parameter Group for security error logging"
+      Family: !Join [ "", [ "postgres", !Ref DBEngineVersion ] ]
+      Parameters:
+        # The following are recommended to assist security scanning.
+        log_statement: "ddl"
+        log_min_duration_statement: "15000"
+  DBParamGroupBlue:
+    Type: AWS::RDS::DBParameterGroup
+    Condition: BlueDeployment
     Properties:
       Description: "DB Parameter Group for security error logging"
       Family: !Join [ "", [ "postgres", !Ref DBEngineVersion ] ]
@@ -307,7 +328,7 @@ Resources:
       BackupRetentionPeriod: !Ref DBBackupRetentionPeriod
       DBInstanceClass: !Ref DBInstanceClass
       DBInstanceIdentifier: !GetAtt DbInstanceName.DBInstanceName
-      DBParameterGroupName: !Ref DBParamGroup
+      DBParameterGroupName: !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
       DBSubnetGroupName: !Ref DBSubnetGroup
       Engine: postgres
       EngineVersion: !Ref DBEngineVersion
