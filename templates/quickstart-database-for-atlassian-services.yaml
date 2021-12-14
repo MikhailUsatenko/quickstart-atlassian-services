@@ -134,7 +134,8 @@ Parameters:
       - "Green"
       - "Blue"
     ConstraintDescription: Must be 'Green' or 'Blue'.
-    Description: When updaing DB engine version, update this value to Green if Blue, Blue if Green. 
+    Description: When updaing DB engine version, update this value to Green if Blue, Blue if Green.
+    Type: String
   QSS3BucketName:
     Default: 'aws-quickstart'
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
