@@ -141,12 +141,12 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
     Type: String
   DBMajorVersionUpgradeSwtich:
-    Default: "Green"
+    Default: Green
     AllowedValues:
-      - "Green"
-      - "Blue"
+      - Green
+      - Blue
     ConstraintDescription: Must be 'Green' or 'Blue'.
-    Description: When updaing DB engine version, switch this value to Green if Blue, Blue if Green. 
+    Description: When updaing DB engine version, switch this value to 'Green' if 'Blue', 'Blue' if 'Green'. 
     Type: String
   CustomDBSecurityGroup:
     Description: The security group to apply to the database
