@@ -448,7 +448,6 @@ Resources:
       DBInstanceClass: !Ref DBInstanceClass
       Engine: aurora-postgresql
       EngineVersion: !Ref DBEngineVersion
-      # DBParameterGroupName: !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
       PubliclyAccessible: false
       Tags:
         -
@@ -482,7 +481,6 @@ Resources:
       DBInstanceClass: !Ref DBInstanceClass
       Engine: aurora-postgresql
       EngineVersion: !Ref DBEngineVersion
-      # DBParameterGroupName: !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
       PubliclyAccessible: false
       Tags:
         -
@@ -516,7 +514,6 @@ Resources:
       DBInstanceClass: !Ref DBInstanceClass
       Engine: aurora-postgresql
       EngineVersion: !Ref DBEngineVersion
-      # DBParameterGroupName: !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
       PubliclyAccessible: false
       Tags:
         -
@@ -541,31 +538,6 @@ Resources:
           Key: Compliance
           Value: !Ref Compliance
     Type: "AWS::RDS::DBInstance"
-
-  # DBParamGroupGreen:
-  #   Type: AWS::RDS::DBParameterGroup
-  #   Condition: GreenDeployment
-  #   Properties:
-  #     Description: !Join [ "- ", [ "Aurora PG Database Instance Parameter Group for Cloudformation Stack ", !Ref DBName ] ]
-  #     Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
-  #     Parameters:
-  #       log_rotation_age: '1440'
-  #       log_rotation_size: '102400'
-  #       # The following are recommended to assist security scanning.
-  #       log_statement: "ddl"
-  #       log_min_duration_statement: "15000"
-  # DBParamGroupBlue:
-  #   Type: AWS::RDS::DBParameterGroup
-  #   Condition: BlueDeployment
-  #   Properties:
-  #     Description: !Join [ "- ", [ "Aurora PG Database Instance Parameter Group for Cloudformation Stack ", !Ref DBName ] ]
-  #     Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
-  #     Parameters:
-  #       log_rotation_age: '1440'
-  #       log_rotation_size: '102400'
-  #       # The following are recommended to assist security scanning.
-  #       log_statement: "ddl"
-  #       log_min_duration_statement: "15000"
   RDSDBClusterParameterGroupGreen:
     Type: AWS::RDS::DBClusterParameterGroup
     Condition: GreenDeployment
@@ -889,14 +861,4 @@ Resources:
       - !If [IsDBMultiAZ, !Ref AuroraDB2, !Ref "AWS::NoValue"]
       - !If [IsDBMultiAZ, !Ref AuroraDB3, !Ref "AWS::NoValue"]
       SourceType: 'db-instance'
-  # DBParameterGroupEventSubscription:
-  #   Condition: EventSubscription
-  #   Type: 'AWS::RDS::EventSubscription'
-  #   Properties:
-  #     EventCategories:
-  #     - "configuration change"
-  #     SnsTopicArn: !Ref DBSNSTopic
-  #     SourceIds:
-  #     - !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
-  #     SourceType: 'db-parameter-group'
   
