@@ -222,6 +222,7 @@ Resources:
         DBName: ''
         DBPort: '5432'
         DBAllowMajorVersionUpgrade: !Ref DBAllowMajorVersionUpgrade
+        DBMajorVersionUpgradeSwtich: !Ref DBMajorVersionUpgradeSwtich
         EnableEventSubscription: 'false'
         Subnet1ID: !Select
           - 0

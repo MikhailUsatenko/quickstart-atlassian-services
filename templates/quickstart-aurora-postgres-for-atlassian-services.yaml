@@ -31,6 +31,7 @@ Metadata:
       - DBAllocatedStorageEncrypted
       - DBExportLogToCloudwatch
       - DBAllowMajorVersionUpgrade
+      - DBMajorVersionUpgradeSwtich
       - EnableEventSubscription
       - NotificationList
     - Label:
@@ -67,6 +68,8 @@ Metadata:
         default: Database connection CIDR
       DBAllowMajorVersionUpgrade:
         default: Allow major database version upgrade
+      DBMajorVersionUpgradeSwtich:
+        default: DB Major version upgrade switch,
       DBMultiAZ:
         default: Multi-AZ deployment
       Subnet1ID:
@@ -148,6 +151,9 @@ Conditions:
     !Equals
     - !Ref CustomDBSecurityGroup
     - ''
+  BlueDeployment: !Equals [!Ref DBMajorVersionUpgradeSwtich, "Blue"]
+  GreenDeployment: !Equals [!Ref DBMajorVersionUpgradeSwtich, "Green"]
+
 Outputs:
   DBName: 
     Description: "Amazon Aurora database name"
@@ -272,6 +278,14 @@ Parameters:
       - true
       - false
     ConstraintDescription: Must be 'true' or 'false'.
+    Type: String
+  DBMajorVersionUpgradeSwtich:
+    Default: Green
+    AllowedValues:
+      - Green
+      - Blue
+    ConstraintDescription: Must be 'Green' or 'Blue'.
+    Description: When updaing DB engine version, switch this value to 'Green' if 'Blue', 'Blue' if 'Green'. 
     Type: String
   CustomDBSecurityGroup:
     Description: "ID of the security group (e.g., sg-0234se). One will be created for you if left empty."
@@ -434,7 +448,7 @@ Resources:
       DBInstanceClass: !Ref DBInstanceClass
       Engine: aurora-postgresql
       EngineVersion: !Ref DBEngineVersion
-      DBParameterGroupName: !Ref DBParamGroup
+      DBParameterGroupName: !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
       PubliclyAccessible: false
       Tags:
         -
@@ -468,7 +482,7 @@ Resources:
       DBInstanceClass: !Ref DBInstanceClass
       Engine: aurora-postgresql
       EngineVersion: !Ref DBEngineVersion
-      DBParameterGroupName: !Ref DBParamGroup
+      DBParameterGroupName: !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
       PubliclyAccessible: false
       Tags:
         -
@@ -502,7 +516,7 @@ Resources:
       DBInstanceClass: !Ref DBInstanceClass
       Engine: aurora-postgresql
       EngineVersion: !Ref DBEngineVersion
-      DBParameterGroupName: !Ref DBParamGroup
+      DBParameterGroupName: !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
       PubliclyAccessible: false
       Tags:
         -
@@ -528,8 +542,9 @@ Resources:
           Value: !Ref Compliance
     Type: "AWS::RDS::DBInstance"
 
-  DBParamGroup:
+  DBParamGroupGreen:
     Type: AWS::RDS::DBParameterGroup
+    Condition: GreenDeployment
     Properties:
       Description: !Join [ "- ", [ "Aurora PG Database Instance Parameter Group for Cloudformation Stack ", !Ref DBName ] ]
       Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
@@ -539,9 +554,21 @@ Resources:
         # The following are recommended to assist security scanning.
         log_statement: "ddl"
         log_min_duration_statement: "15000"
-
-  RDSDBClusterParameterGroup:
+  DBParamGroupBlue:
+    Type: AWS::RDS::DBParameterGroup
+    Condition: BlueDeployment
+    Properties:
+      Description: !Join [ "- ", [ "Aurora PG Database Instance Parameter Group for Cloudformation Stack ", !Ref DBName ] ]
+      Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
+      Parameters:
+        log_rotation_age: '1440'
+        log_rotation_size: '102400'
+        # The following are recommended to assist security scanning.
+        log_statement: "ddl"
+        log_min_duration_statement: "15000"
+  RDSDBClusterParameterGroupGreen:
     Type: AWS::RDS::DBClusterParameterGroup
+    Condition: GreenDeployment
     Properties:
       Description: !Join [ "- ", [ "Aurora PG Cluster Parameter Group for  Cloudformation Stack ", !Ref DBName ] ]
       Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
@@ -550,12 +577,22 @@ Resources:
         # The following are recommended to assist security scanning.
         log_statement: "ddl"
         log_min_duration_statement: 15000
-
+  RDSDBClusterParameterGroupBlue:
+    Type: AWS::RDS::DBClusterParameterGroup
+    Condition: BlueDeployment
+    Properties:
+      Description: !Join [ "- ", [ "Aurora PG Cluster Parameter Group for  Cloudformation Stack ", !Ref DBName ] ]
+      Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
+      Parameters:
+        rds.force_ssl: 0
+        # The following are recommended to assist security scanning.
+        log_statement: "ddl"
+        log_min_duration_statement: 15000
   AuroraDBCluster:
     Type: "AWS::RDS::DBCluster"
     Properties:
       BackupRetentionPeriod: !Ref DBBackupRetentionPeriod
-      DBClusterParameterGroupName: !Ref RDSDBClusterParameterGroup
+      DBClusterParameterGroupName: !If [GreenDeployment, !Ref RDSDBClusterParameterGroupGreen, !Ref RDSDBClusterParameterGroupBlue]
       DBSubnetGroupName: !Ref AuroraDBSubnetGroup
       EnableCloudwatchLogsExports: 
         - !If [EnableDBLogExport, postgresql, !Ref 'AWS::NoValue']
@@ -860,6 +897,6 @@ Resources:
       - "configuration change"
       SnsTopicArn: !Ref DBSNSTopic
       SourceIds:
-      - !Ref DBParamGroup
+      - !If [GreenDeployment, !Ref DBParamGroupGreen, !Ref DBParamGroupBlue]
       SourceType: 'db-parameter-group'
   
