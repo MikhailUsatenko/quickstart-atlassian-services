@@ -278,6 +278,7 @@ Parameters:
       - true
       - false
     ConstraintDescription: Must be 'true' or 'false'.
+    Description: Allow major database version upgrade.
     Type: String
   DBMajorVersionUpgradeSwtich:
     Default: Green
