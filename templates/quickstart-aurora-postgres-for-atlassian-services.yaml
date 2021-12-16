@@ -545,6 +545,8 @@ Resources:
       Description: !Join [ "- ", [ "Aurora PG Cluster Parameter Group for  Cloudformation Stack ", !Ref DBName ] ]
       Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
       Parameters:
+        log_rotation_age: '1440'
+        log_rotation_size: '102400'
         rds.force_ssl: 0
         # The following are recommended to assist security scanning.
         log_statement: "ddl"
@@ -556,6 +558,8 @@ Resources:
       Description: !Join [ "- ", [ "Aurora PG Cluster Parameter Group for  Cloudformation Stack ", !Ref DBName ] ]
       Family: !FindInMap [DBFamilyMap, !Ref DBEngineVersion, "family"]
       Parameters:
+        log_rotation_age: '1440'
+        log_rotation_size: '102400'
         rds.force_ssl: 0
         # The following are recommended to assist security scanning.
         log_statement: "ddl"
