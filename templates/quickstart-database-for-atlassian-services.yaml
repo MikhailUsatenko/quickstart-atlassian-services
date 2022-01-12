@@ -16,9 +16,8 @@ Parameters:
     ConstraintDescription: Must be 'Amazon Aurora PostgreSQL' or 'PostgreSQL'.
     Type: String
   DBEngineVersion:
-    Default: 9
+    Default: 10
     AllowedValues:
-      - 9
       - 10
       - 11
       - 12
